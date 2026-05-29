@@ -115,8 +115,8 @@ export default function App() {
 
   const handleBookingConfirm = useCallback(
     (state: BookingState) => {
-      const day = state.selectedDate ? dateToDay(state.selectedDate) : 'tue'
-      const [h, m] = (state.selectedSlot ?? '15:40').split(':').map(Number)
+      const day = state.block.days[0] ?? 'tue'
+      const [h, m] = (state.selectedSlot ?? \`\${state.block.startHour}:00\`).split(':').map(Number)
       const isStudy = state.sessionType === 'study-session'
       const endHour = h + 1
       const endMinute = m

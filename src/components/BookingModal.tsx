@@ -30,7 +30,7 @@ function generateSlots(block: CalendarBlock): Slot[] {
     const h12 = h % 12 || 12
     const label = `${h12}:${m === 0 ? '00' : String(m).padStart(2, '0')}${ampm}`
     const full = i < 2 && pseudo(i) > 0.6
-    const open = full ? 0 : (pseudo(i + 10) > 0.6 ? 1 : pseudo(i + 10) > 0.3 ? 2 : 3)
+    const open = full ? 0 : 1
     return { time: `${h}:${String(m).padStart(2, '0')}`, label, full, open }
   })
 }

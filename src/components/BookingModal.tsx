@@ -1,8 +1,4 @@
-import {
-  Check,
-  Copy,
-  X,
-} from 'lucide-react'
+import { AlertTriangle, Check, Copy, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useAccessibility } from '../accessibility/AccessibilityContext'
 import { useFocusTrap } from '../hooks/useFocusTrap'
@@ -29,14 +25,18 @@ function generateSlots(block: CalendarBlock): Slot[] {
     const ampm = h >= 12 ? 'pm' : 'am'
     const h12 = h % 12 || 12
     const label = `${h12}:${m === 0 ? '00' : String(m).padStart(2, '0')}${ampm}`
+    // First 2 slots have a chance of being full, rest always open
     const full = i < 2 && pseudo(i) > 0.6
-    const open = full ? 0 : 1
-    return { time: `${h}:${String(m).padStart(2, '0')}`, label, full, open }
+    return { time: `${h}:${String(m).padStart(2, '0')}`, label, full, open: full ? 0 : 1 }
   })
 }
 
 function buildGCalUrl(params: {
-  title: string; start: Date; end: Date; location: string; details: string
+  title: string
+  start: Date
+  end: Date
+  location: string
+  details: string
 }): string {
   const pad = (n: number) => n.toString().padStart(2, '0')
   const fmt = (d: Date) =>
@@ -64,6 +64,8 @@ export function BookingModal({ booking, onClose, onUpdate, onConfirm }: BookingM
   const [showCheck, setShowCheck] = useState(false)
   const [checkRing, setCheckRing] = useState(false)
   const [copied, setCopied] = useState(false)
+  // Track slots that got taken while user was browsing (double-booking warning)
+  const [takenSlots, setTakenSlots] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (booking?.step === 3) {
@@ -78,17 +80,22 @@ export function BookingModal({ booking, onClose, onUpdate, onConfirm }: BookingM
     }
   }, [booking?.step])
 
+  // Reset taken slots when modal opens fresh
+  useEffect(() => {
+    if (booking?.step === 1) setTakenSlots(new Set())
+  }, [booking?.block?.id])
+
   if (!booking) return null
 
   const { block, step, sessionType, selectedSlot, description, notes } = booking
   const slots = generateSlots(block)
   const shareLink = `studybarns.app/session/${(block.course ?? 'session').toLowerCase().replace(/\s/g, '')}-apr29`
-  const canNext1 = selectedSlot !== null
+  const canNext1 = selectedSlot !== null && !takenSlots.has(selectedSlot)
   const canNext2 = description.trim().length >= 3
   const headerTitle = block.instructor ?? block.label.split('·').pop()?.trim() ?? block.label
 
   const dayLabelMap: Record<string, string> = {
-    mon: 'Mon Apr 28', tue: 'Tue Apr 29', wed: 'Wed Apr 30', thu: 'Thu May 1', fri: 'Fri May 2'
+    mon: 'Mon Apr 28', tue: 'Tue Apr 29', wed: 'Wed Apr 30', thu: 'Thu May 1', fri: 'Fri May 2',
   }
   const dayLabel = dayLabelMap[block.days[0] ?? 'tue'] ?? 'Tue Apr 29'
 
@@ -96,7 +103,7 @@ export function BookingModal({ booking, onClose, onUpdate, onConfirm }: BookingM
     const slotStr = selectedSlot ?? `${block.startHour}:00`
     const [h, m] = slotStr.split(':').map(Number)
     const dateMap: Record<string, [number, number]> = {
-      mon: [3, 28], tue: [3, 29], wed: [3, 30], thu: [4, 1], fri: [4, 2]
+      mon: [3, 28], tue: [3, 29], wed: [3, 30], thu: [4, 1], fri: [4, 2],
     }
     const [month, date] = dateMap[block.days[0] ?? 'tue'] ?? [3, 29]
     return new Date(2025, month, date, h, m)
@@ -109,7 +116,7 @@ export function BookingModal({ booking, onClose, onUpdate, onConfirm }: BookingM
     start: parseSlotDate(),
     end: new Date(parseSlotDate().getTime() + 20 * 60 * 1000),
     location: block.location ?? 'UC Davis',
-    details: `${description}${notes ? `\n\nNotes: ${notes}` : ''}\n\nBooked via StudyBarns\n\n⏰ Reminders: 1 day before, 1 hour before, 10 minutes before`,
+    details: `${description}${notes ? `\n\nNotes: ${notes}` : ''}\n\nBooked via StudyBarns\n\n⏰ Reminders set for 1 day, 1 hour, and 10 minutes before`,
   })
 
   const handleCopy = async () => {
@@ -117,6 +124,24 @@ export function BookingModal({ booking, onClose, onUpdate, onConfirm }: BookingM
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
+
+  const handleSlotClick = (slot: Slot) => {
+    if (slot.full || takenSlots.has(slot.time)) return
+    // Deselect if clicking the already-selected slot
+    if (selectedSlot === slot.time) {
+      onUpdate({ selectedSlot: null })
+      return
+    }
+    // Simulate a race condition: if another slot was selected before,
+    // mark it as now taken (someone else grabbed it)
+    if (selectedSlot && Math.random() < 0.15) {
+      setTakenSlots(prev => new Set(prev).add(selectedSlot))
+    }
+    onUpdate({ selectedSlot: slot.time, sessionType: block.bookingType ?? 'office-hours' })
+  }
+
+  const isSlotTaken = (slot: Slot) => slot.full || takenSlots.has(slot.time)
+  const selectedSlotJustTaken = selectedSlot !== null && takenSlots.has(selectedSlot)
 
   const stepLabels = ['Pick a time', 'Details', 'Confirmed!']
 
@@ -140,6 +165,7 @@ export function BookingModal({ booking, onClose, onUpdate, onConfirm }: BookingM
               <X className="h-5 w-5" />
             </button>
           </div>
+          {/* Progress */}
           <div className="mt-4 flex items-center">
             {stepLabels.map((label, i) => {
               const n = i + 1
@@ -168,29 +194,47 @@ export function BookingModal({ booking, onClose, onUpdate, onConfirm }: BookingM
           {step === 1 && (
             <div>
               <p className="mb-1 text-sm font-semibold text-navy">{block.sublabel} · {block.location ?? 'Campus'}</p>
-              <p className="mb-4 text-xs text-gray-400">Select a 20-minute slot within the scheduled hours</p>
+              <p className="mb-3 text-xs text-gray-400">Each slot is 20 minutes · One student per slot</p>
+
+              {/* Double-booking warning */}
+              {selectedSlotJustTaken && (
+                <div className="mb-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+                  <span>That slot was just taken by another student. Please choose a different time.</span>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {slots.map((slot) => (
-                  <button
-                    key={slot.time}
-                    type="button"
-                    disabled={slot.full}
-                    onClick={() => onUpdate({ selectedSlot: slot.time, sessionType: block.bookingType ?? 'office-hours' })}
-                    className={`rounded border px-2 py-3 text-xs transition-all duration-200 ${
-                      slot.full
-                        ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
-                        : selectedSlot === slot.time
-                          ? 'border-gold bg-navy text-white shadow-md'
-                          : 'border-gray-200 bg-white hover:border-navy'
-                    }`}
-                  >
-                    <div className="font-semibold">{slot.label}</div>
-                    {slot.full
-                      ? <span className="text-red-400">Full</span>
-                      : <span className="text-green-600">{slot.open} slot{slot.open > 1 ? 's' : ''} open</span>
-                    }
-                  </button>
-                ))}
+                {slots.map((slot) => {
+                  const taken = isSlotTaken(slot)
+                  const isSelected = selectedSlot === slot.time
+                  const isJustTaken = takenSlots.has(slot.time)
+                  return (
+                    <button
+                      key={slot.time}
+                      type="button"
+                      disabled={taken}
+                      onClick={() => handleSlotClick(slot)}
+                      className={`rounded border px-2 py-3 text-xs transition-all duration-200 ${
+                        taken
+                          ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
+                          : isSelected && isJustTaken
+                            ? 'border-red-300 bg-red-50 text-red-700'
+                            : isSelected
+                              ? 'border-gold bg-navy text-white shadow-md'
+                              : 'border-gray-200 bg-white hover:border-navy'
+                      }`}
+                    >
+                      <div className="font-semibold">{slot.label}</div>
+                      {slot.full
+                        ? <span className="text-red-400">Full</span>
+                        : isJustTaken
+                          ? <span className="text-red-400">Just taken</span>
+                          : <span className="text-green-600">1 slot open</span>
+                      }
+                    </button>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -237,7 +281,7 @@ export function BookingModal({ booking, onClose, onUpdate, onConfirm }: BookingM
             </div>
           )}
 
-          {/* Step 3: Confirmed with animated checkmark */}
+          {/* Step 3: Confirmed */}
           {step === 3 && (
             <div className="flex flex-col items-center py-4">
               <div className="relative mb-6 flex h-28 w-28 items-center justify-center">
@@ -251,7 +295,6 @@ export function BookingModal({ booking, onClose, onUpdate, onConfirm }: BookingM
                   className="relative flex h-20 w-20 items-center justify-center rounded-full bg-green-500 shadow-lg transition-all duration-500 ease-out"
                   style={{ transform: showCheck ? 'scale(1)' : 'scale(0.3)', opacity: showCheck ? 1 : 0 }}
                 >
-                  {/* Animated SVG checkmark */}
                   <svg viewBox="0 0 40 40" className="h-10 w-10" fill="none">
                     <path
                       d="M8 20 L16 28 L32 12"
@@ -318,6 +361,7 @@ export function BookingModal({ booking, onClose, onUpdate, onConfirm }: BookingM
           )}
         </div>
 
+        {/* Footer nav */}
         {step < 3 && (
           <div className="flex justify-end gap-2 border-t border-gray-100 px-5 py-4">
             {step > 1 && (

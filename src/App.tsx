@@ -102,6 +102,11 @@ export default function App() {
   )
 
   const openBooking = useCallback((block: CalendarBlock) => {
+    // Prevent booking the same block twice
+    const alreadyBooked = rightBlocks.some(
+      (b) => b.organizer === block.organizer && b.sublabel?.includes('Booked')
+    )
+    if (alreadyBooked) return
     setBooking({
       block,
       step: 1,
@@ -111,7 +116,7 @@ export default function App() {
       description: '',
       notes: '',
     })
-  }, [])
+  }, [rightBlocks])
 
   const handleBookingConfirm = useCallback(
     (state: BookingState) => {

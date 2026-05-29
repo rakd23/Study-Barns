@@ -1,11 +1,30 @@
-import { Accessibility, Ghost } from 'lucide-react'
+import { Accessibility, Ghost, Moon } from 'lucide-react'
 import { useAccessibility } from '../accessibility/AccessibilityContext'
 
 export function HeaderControls() {
-  const { panelOpen, setPanelOpen, incognito, setIncognito } = useAccessibility()
+  const { panelOpen, setPanelOpen, incognito, setIncognito, settings, toggleSetting } = useAccessibility()
+  const darkMode = settings.darkMode
 
   return (
     <div className="flex items-center gap-3">
+
+      {/* Dark Mode */}
+      <button
+        type="button"
+        role="switch"
+        aria-checked={darkMode}
+        onClick={() => toggleSetting('darkMode')}
+        className={`a11y-focusable flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-xs transition-colors duration-200 ${
+          darkMode
+            ? 'border-white/40 bg-white/20 font-semibold text-white'
+            : 'border-white/20 text-white hover:bg-white/10'
+        }`}
+      >
+        <Moon className="h-3.5 w-3.5" aria-hidden />
+        <span>Dark Mode</span>
+      </button>
+
+      {/* Incognito */}
       <button
         type="button"
         role="switch"
@@ -21,6 +40,7 @@ export function HeaderControls() {
         <span>Incognito</span>
       </button>
 
+      {/* Accessibility */}
       <button
         type="button"
         onClick={() => setPanelOpen(!panelOpen)}

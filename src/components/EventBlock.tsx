@@ -12,7 +12,7 @@ interface EventBlockProps {
   starRating?: number
   onClick?: () => void
   onMemberJoin?: () => void
-  incognito?: boolean
+  isDark?: boolean
 }
 
 const blockRadiusStyle = { borderRadius: BLOCK_BORDER_RADIUS_PX }
@@ -44,7 +44,7 @@ export function EventBlock({
   starRating,
   onClick,
   onMemberJoin,
-  incognito = false,
+  isDark = false,
 }: EventBlockProps) {
   const { settings } = useAccessibility()
   const visual = getBlockVisualStyle(block.color, settings)
@@ -56,7 +56,7 @@ export function EventBlock({
     block.endMinute,
   )
 
-  const useDark = incognito || settings.darkMode
+  const useDark = isDark || settings.darkMode
   const highContrast = settings.highContrast
 
   const blockStyle = useDark

@@ -12,7 +12,7 @@ interface CalendarDayColumnProps {
   onMemberJoin?: (blockId: string) => void
   className?: string
   style?: React.CSSProperties
-  incognito?: boolean
+  isDark?: boolean
 }
 
 export function CalendarDayColumn({
@@ -26,13 +26,13 @@ export function CalendarDayColumn({
   onMemberJoin,
   className = '',
   style,
-  incognito = false,
+  isDark = false,
 }: CalendarDayColumnProps) {
   const dayBlocks = blocks.filter((b) => b.days.includes(day))
 
-  const borderColor = incognito ? 'border-white/5' : 'border-gray-100'
-  const evenColor = incognito ? 'border-white/5' : 'border-gray-100'
-  const oddColor = incognito ? 'border-white/[0.03]' : 'border-gray-50'
+  const borderColor = isDark ? 'border-white/5' : 'border-gray-100'
+  const evenColor = isDark ? 'border-white/5' : 'border-gray-100'
+  const oddColor = isDark ? 'border-white/[0.03]' : 'border-gray-50'
 
   return (
     <div
@@ -64,7 +64,7 @@ export function CalendarDayColumn({
           onMemberJoin={
             onMemberJoin ? () => onMemberJoin(block.id) : undefined
           }
-          incognito={incognito}
+          isDark={isDark}
         />
       ))}
     </div>

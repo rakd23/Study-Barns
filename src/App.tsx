@@ -230,6 +230,8 @@ export default function App() {
     })
   }
 
+  const isDark = incognito || settings.darkMode
+
   const showFocusSplit =
     settings.focusMode && !focusPanelExpanded && !settings.simplifiedView
   const showFullGrid =
@@ -250,18 +252,18 @@ export default function App() {
     <div
       id="app-shell"
       className={`flex h-screen flex-col overflow-hidden transition-colors duration-300 ${
-        incognito ? 'bg-[#1a1a2e]' : 'bg-white'
+        isDark ? 'bg-[#1a1a2e]' : 'bg-white'
       }`}
     >
       {/* Header */}
       <header
         className={`flex shrink-0 items-center justify-between gap-4 px-6 py-3 shadow-md transition-colors duration-300 ${
-          incognito ? 'bg-[#0a1020]' : 'bg-navy'
+          isDark ? 'bg-[#0a1020]' : 'bg-navy'
         }`}
       >
         <h1 className="text-xl font-bold tracking-tight text-gold">StudyBarns</h1>
         <div className="flex items-center gap-4">
-          <span className={`hidden text-sm sm:inline ${incognito ? 'text-gray-300' : 'text-white'}`}>
+          <span className={`hidden text-sm sm:inline ${isDark ? 'text-gray-300' : 'text-white'}`}>
             UC Davis · Spring 2025
           </span>
           <HeaderControls />
@@ -278,7 +280,7 @@ export default function App() {
       {/* Nav bar */}
       <nav
         className={`flex shrink-0 items-center justify-between border-b px-4 py-2.5 shadow-sm transition-colors duration-300 ${
-          incognito
+          isDark
             ? 'border-white/10 bg-[#1a1a2e] text-gray-200'
             : 'border-gray-200 bg-white'
         }`}
@@ -287,21 +289,21 @@ export default function App() {
           <button
             type="button"
             className={`rounded p-1.5 transition-colors duration-200 ${
-              incognito ? 'text-gray-300 hover:bg-white/10' : 'text-gray-500 hover:bg-gray-100'
+              isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-500 hover:bg-gray-100'
             }`}
             aria-label="Previous week"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <span
-            className={`text-sm font-semibold ${incognito ? 'text-gray-100' : 'text-navy'}`}
+            className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-navy'}`}
           >
             {weekLabel}
           </span>
           <button
             type="button"
             className={`rounded p-1.5 transition-colors duration-200 ${
-              incognito ? 'text-gray-300 hover:bg-white/10' : 'text-gray-500 hover:bg-gray-100'
+              isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-500 hover:bg-gray-100'
             }`}
             aria-label="Next week"
           >
@@ -310,7 +312,7 @@ export default function App() {
           <button
             type="button"
             className={`ml-1 rounded border px-2.5 py-1 text-xs font-medium transition-all duration-200 ${
-              incognito
+              isDark
                 ? 'border-white/20 text-gray-200 hover:bg-white/10'
                 : 'border-navy text-navy hover:bg-navy hover:text-white'
             }`}
@@ -320,7 +322,7 @@ export default function App() {
         </div>
         <div
           className={`flex items-center gap-1.5 text-xs font-medium ${
-            incognito ? 'text-green-400' : 'text-green-600'
+            isDark ? 'text-green-400' : 'text-green-600'
           }`}
         >
           <RefreshCw className="h-3.5 w-3.5" />
@@ -332,20 +334,20 @@ export default function App() {
 
       <main
         className={`flex min-h-0 flex-1 flex-col overflow-hidden transition-colors duration-300 ${
-          incognito ? 'bg-[#1a1a2e]' : 'bg-white'
+          isDark ? 'bg-[#1a1a2e]' : 'bg-white'
         }`}
       >
         {/* Panel headers — only shown when not in simplified view */}
         {!settings.simplifiedView && (
           <div
             className={`flex shrink-0 border-b transition-colors duration-300 ${
-              incognito ? 'border-white/10' : 'border-gray-200'
+              isDark ? 'border-white/10' : 'border-gray-200'
             }`}
           >
             {/* Left panel header */}
             <div
               className={`flex min-w-0 border-r transition-colors duration-300 ${
-                incognito ? 'border-white/10' : 'border-gray-200'
+                isDark ? 'border-white/10' : 'border-gray-200'
               } ${showFocusSplit ? 'flex-1' : 'flex-1'}`}
             >
               <PanelHeader
@@ -353,7 +355,7 @@ export default function App() {
                 title="My classes & assignments"
                 badge="Canvas"
                 badgeClass="bg-navy text-white"
-                incognito={incognito}
+                isDark={isDark}
               />
             </div>
 
@@ -364,8 +366,8 @@ export default function App() {
                   icon={<GraduationCap className="h-4 w-4 text-navy" />}
                   title="Academic support"
                   badge="AATC + OH + Study"
-                  badgeClass={incognito ? 'bg-white/10 text-gray-200' : 'bg-gray-100 text-navy'}
-                  incognito={incognito}
+                  badgeClass={isDark ? 'bg-white/10 text-gray-200' : 'bg-gray-100 text-navy'}
+                  isDark={isDark}
                   action={
                     <button
                       type="button"
@@ -383,13 +385,13 @@ export default function App() {
             {showFocusSplit && (
               <div
                 className={`flex min-w-0 flex-1 items-center border-l px-4 transition-colors duration-300 ${
-                  incognito
-                    ? 'border-white/10 bg-white/5'
+                  isDark
+                    ? \'border-white/10 bg-white/5\'
                     : 'border-gray-200 bg-amber-50/50'
                 }`}
               >
                 <p
-                  className={`text-sm font-medium ${incognito ? 'text-gray-100' : 'text-navy'}`}
+                  className={`text-sm font-medium ${isDark ? 'text-gray-100' : 'text-navy'}`}
                 >
                   Focus Mode
                 </p>
@@ -410,7 +412,7 @@ export default function App() {
           <div className="flex min-h-0 flex-1 overflow-hidden">
             <div
               className={`flex min-w-0 flex-1 flex-col border-r transition-colors duration-300 ${
-                incognito ? 'border-white/10' : 'border-gray-200'
+                isDark ? 'border-white/10' : 'border-gray-200'
               }`}
             >
               <SharedWeekGrid
@@ -419,7 +421,7 @@ export default function App() {
                 rightBlocks={[]}
                 confirmedIds={confirmedIds}
                 starRatings={starRatings}
-                incognito={incognito}
+                isDark={isDark}
               />
             </div>
             <div className="flex min-w-0 flex-1 flex-col">
@@ -439,7 +441,7 @@ export default function App() {
               if (block.clickable) openBooking(block)
             }}
             onMemberJoin={handleJoinSession}
-            incognito={incognito}
+            isDark={isDark}
           />
         ) : null}
       </main>
@@ -489,18 +491,18 @@ function PanelHeader({
   badge: string
   badgeClass: string
   action?: React.ReactNode
-  incognito?: boolean
+  isDark?: boolean
 }) {
   return (
     <div
       className={`flex w-full shrink-0 items-center justify-between gap-2 px-4 py-2.5 transition-colors duration-300 ${
-        incognito ? 'bg-[#1a1a2e]' : 'bg-white'
+        isDark ? 'bg-[#1a1a2e]' : 'bg-white'
       }`}
     >
       <div className="flex items-center gap-2">
         {icon}
         <h2
-          className={`text-sm font-semibold ${incognito ? 'text-gray-100' : 'text-navy'}`}
+          className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-navy'}`}
         >
           {title}
         </h2>

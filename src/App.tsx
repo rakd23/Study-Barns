@@ -386,7 +386,7 @@ export default function App() {
               <div
                 className={`flex min-w-0 flex-1 items-center border-l px-4 transition-colors duration-300 ${
                   isDark
-                    ? \'border-white/10 bg-white/5\'
+                    ? 'border-white/10 bg-white/5'
                     : 'border-gray-200 bg-amber-50/50'
                 }`}
               >

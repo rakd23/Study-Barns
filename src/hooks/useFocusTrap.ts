@@ -3,6 +3,19 @@ import { useEffect, useRef } from 'react'
 const FOCUSABLE =
   'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
 
+function isTypingTarget(el: Element | null): boolean {
+  if (!el) return false
+  const tag = (el as HTMLElement).tagName
+  return (
+    tag === 'TEXTAREA' ||
+    tag === 'SELECT' ||
+    (tag === 'INPUT' &&
+      !['button', 'submit', 'reset', 'checkbox', 'radio'].includes(
+        (el as HTMLInputElement).type,
+      ))
+  )
+}
+
 export function useFocusTrap(
   active: boolean,
   onEscape?: () => void,
@@ -27,6 +40,15 @@ export function useFocusTrap(
     }, 0)
 
     const onKeyDown = (e: KeyboardEvent) => {
+      // Never intercept keystrokes when the user is typing in a text field
+      if (isTypingTarget(document.activeElement)) {
+        // Only handle Escape even in text fields
+        if (e.key === 'Escape') {
+          onEscape?.()
+        }
+        return
+      }
+
       if (e.key === 'Escape') {
         onEscape?.()
         return

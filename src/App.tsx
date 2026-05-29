@@ -484,7 +484,7 @@ function PanelHeader({
   badge,
   badgeClass,
   action,
-  incognito,
+  isDark,
 }: {
   icon: React.ReactNode
   title: string

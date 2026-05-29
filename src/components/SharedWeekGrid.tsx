@@ -70,6 +70,7 @@ export function SharedWeekGrid({
   const scrollRef = useRef<HTMLDivElement>(null)
   const rightScrollRef = useRef<HTMLDivElement>(null)
   const timeRailRef = useRef<HTMLDivElement>(null)
+  const rightTimeRailRef = useRef<HTMLDivElement>(null)
   const isSyncing = useRef(false)
 
   const showLeft = viewMode === 'full' || viewMode === 'left'
@@ -112,11 +113,17 @@ export function SharedWeekGrid({
       rightScrollRef.current.scrollTop = top
       isSyncing.current = false
     }
+    if (rightTimeRailRef.current) {
+      rightTimeRailRef.current.style.transform = `translateY(-${top}px)`
+    }
   }
 
   const handleRightScroll = () => {
     if (isSyncing.current) return
     const top = rightScrollRef.current?.scrollTop ?? 0
+    if (rightTimeRailRef.current) {
+      rightTimeRailRef.current.style.transform = `translateY(-${top}px)`
+    }
     if (scrollRef.current && scrollRef.current.scrollTop !== top) {
       isSyncing.current = true
       scrollRef.current.scrollTop = top
@@ -229,7 +236,7 @@ export function SharedWeekGrid({
               style={{ width: TIME_GUTTER_WIDTH }}
               aria-hidden
             >
-              <div className="relative" style={{ height: gridHeight }}>
+              <div ref={rightTimeRailRef} className="relative will-change-transform" style={{ height: gridHeight }}>
                 {hours.map((hour, i) => (
                   <div
                     key={hour}

@@ -14,7 +14,7 @@ interface Slot {
 function generateSlots(block: CalendarBlock): Slot[] {
   const { startHour, startMinute, endHour, endMinute, id } = block
   const totalMins = (endHour * 60 + endMinute) - (startHour * 60 + startMinute)
-  const count = Math.floor(totalMins / 20)
+  const count = Math.max(3, Math.floor(totalMins / 20))
   const seed = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
   const pseudo = (i: number) => ((seed * 31 + i * 17) % 100) / 100
 
@@ -92,7 +92,7 @@ export function BookingModal({ booking, onClose, onUpdate, onConfirm }: BookingM
   const shareLink = `studybarns.app/session/${(block.course ?? 'session').toLowerCase().replace(/\s/g, '')}-apr29`
   const canNext1 = selectedSlot !== null && !takenSlots.has(selectedSlot)
   const canNext2 = description.trim().length >= 3
-  const headerTitle = block.instructor ?? block.label.split('·').pop()?.trim() ?? block.label
+  const headerTitle = block.instructor ?? block.course ?? block.label.split('·').pop()?.trim() ?? block.label
 
   const dayLabelMap: Record<string, string> = {
     mon: 'Mon Apr 28', tue: 'Tue Apr 29', wed: 'Wed Apr 30', thu: 'Thu May 1', fri: 'Fri May 2',

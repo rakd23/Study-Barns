@@ -30,8 +30,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Text scale: applied directly to html element font-size via JS,
+   so all rem-based sizes scale automatically across the entire app */
 #root {
-  font-size: calc(1rem * var(--a11y-text-scale, 1));
+  font-size: inherit;
 }
 
 /* Color-blind pattern overlays */
@@ -72,18 +74,11 @@ body {
     );
 }
 
-/* High contrast: bold text + 2px black borders on all block elements */
+/* ── High Contrast ─────────────────────────────── */
 .a11y-high-contrast #app-shell,
 .a11y-high-contrast #app-shell main,
 .a11y-high-contrast .bg-white {
   background-color: #ffffff !important;
-}
-
-.a11y-high-contrast .text-gray-400,
-.a11y-high-contrast .text-gray-500,
-.a11y-high-contrast .text-gray-600 {
-  color: #000000 !important;
-  font-weight: 700 !important;
 }
 
 .a11y-high-contrast p,
@@ -105,41 +100,61 @@ body {
   border: 2px solid #000000 !important;
 }
 
-/* Reduced motion: kill all animations and transitions */
-.a11y-reduced-motion *,
-.a11y-reduced-motion *::before,
-.a11y-reduced-motion *::after {
-  animation-duration: 0.001ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.001ms !important;
-  transition-delay: 0ms !important;
+.a11y-high-contrast .text-gray-400,
+.a11y-high-contrast .text-gray-500,
+.a11y-high-contrast .text-gray-600 {
+  color: #000000 !important;
 }
 
-.a11y-reduced-motion .animate-modal-in,
-.a11y-reduced-motion .animate-check-in,
-.a11y-reduced-motion .animate-review-in,
-.a11y-reduced-motion .animate-review-out {
-  animation: none !important;
-  opacity: 1 !important;
-  transform: none !important;
+/* ── Dark Mode (persistent, separate from Incognito) ── */
+.a11y-dark-mode #app-shell {
+  background-color: #1a1a2e !important;
 }
 
-/* Keyboard navigation: prominent blue focus rings on ALL interactive elements */
-.a11y-keyboard-nav .a11y-focusable:focus-visible {
-  outline: 3px solid #2563eb !important;
-  outline-offset: 2px !important;
-  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.3) !important;
+.a11y-dark-mode header {
+  background-color: #0a1020 !important;
 }
 
-.a11y-keyboard-nav button:focus-visible,
-.a11y-keyboard-nav a:focus-visible,
-.a11y-keyboard-nav input:focus-visible,
-.a11y-keyboard-nav select:focus-visible,
-.a11y-keyboard-nav textarea:focus-visible,
-.a11y-keyboard-nav [role="switch"]:focus-visible {
-  outline: 3px solid #2563eb !important;
-  outline-offset: 2px !important;
-  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.3) !important;
+.a11y-dark-mode nav,
+.a11y-dark-mode main,
+.a11y-dark-mode .bg-white,
+.a11y-dark-mode .bg-gray-50 {
+  background-color: #1a1a2e !important;
+  color: #e5e7eb !important;
+}
+
+.a11y-dark-mode .text-navy,
+.a11y-dark-mode .text-gray-700,
+.a11y-dark-mode .text-gray-900 {
+  color: #e5e7eb !important;
+}
+
+.a11y-dark-mode .text-gray-400,
+.a11y-dark-mode .text-gray-500,
+.a11y-dark-mode .text-gray-600 {
+  color: #9ca3af !important;
+}
+
+.a11y-dark-mode .border-gray-200,
+.a11y-dark-mode .border-gray-100 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.a11y-dark-mode .bg-gray-100 {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Screen-reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 @keyframes modal-in {

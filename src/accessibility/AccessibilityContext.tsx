@@ -37,15 +37,16 @@ interface AccessibilityContextValue {
     key: Exclude<AccessibilitySettingKey, 'textSize'> | 'textSize'
     label: string
   }[]
+  // kept for compatibility — always false now
   reducedMotion: boolean
 }
 
 const AccessibilityContext = createContext<AccessibilityContextValue | null>(null)
 
 const TEXT_SCALE: Record<TextSize, number> = {
-  small: 0.85,
+  small: 0.82,
   medium: 1,
-  large: 1.2,
+  large: 1.22,
 }
 
 export function AccessibilityProvider({ children }: { children: ReactNode }) {
@@ -56,7 +57,8 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
   const [focusPanelExpanded, setFocusPanelExpanded] = useState(false)
   const [incognito, setIncognito] = useState(false)
 
-  const reducedMotion = settings.reducedMotion
+  // reducedMotion is gone — always false
+  const reducedMotion = false
 
   useEffect(() => {
     saveAccessibilitySettings(settings)
@@ -65,9 +67,10 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const root = document.documentElement
     root.classList.toggle('a11y-high-contrast', settings.highContrast)
-    root.classList.toggle('a11y-reduced-motion', settings.reducedMotion)
-    root.classList.toggle('a11y-keyboard-nav', settings.keyboardNav)
+    root.classList.toggle('a11y-dark-mode', settings.darkMode)
+    // text scale: apply to both html and #root so rem-based sizes scale correctly
     root.style.setProperty('--a11y-text-scale', String(TEXT_SCALE[settings.textSize]))
+    root.style.fontSize = `calc(16px * ${TEXT_SCALE[settings.textSize]})`
   }, [settings])
 
   const setSetting = useCallback(

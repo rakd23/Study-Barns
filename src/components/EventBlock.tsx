@@ -17,7 +17,6 @@ interface EventBlockProps {
 
 const blockRadiusStyle = { borderRadius: BLOCK_BORDER_RADIUS_PX }
 
-// Darker versions of each color for incognito mode
 const INCOGNITO_BLOCK_STYLES: Record<string, { bg: string; border: string; text: string }> = {
   ecs: { bg: 'bg-blue-900/70', border: 'border-blue-700', text: 'text-blue-200' },
   bis: { bg: 'bg-green-900/70', border: 'border-green-700', text: 'text-green-200' },
@@ -30,6 +29,15 @@ const INCOGNITO_BLOCK_STYLES: Record<string, { bg: string; border: string; text:
   study: { bg: 'bg-rose-900/70', border: 'border-rose-700', text: 'text-rose-200' },
 }
 
+function announceBlock(block: CalendarBlock) {
+  if (!('speechSynthesis' in window)) return
+  const label = getBlockAriaLabel(block)
+  window.speechSynthesis.cancel()
+  const utt = new SpeechSynthesisUtterance(label)
+  utt.rate = 0.95
+  window.speechSynthesis.speak(utt)
+}
+
 export function EventBlock({
   block,
   confirmed,
@@ -38,7 +46,7 @@ export function EventBlock({
   onMemberJoin,
   incognito = false,
 }: EventBlockProps) {
-  const { settings, reducedMotion } = useAccessibility()
+  const { settings } = useAccessibility()
   const visual = getBlockVisualStyle(block.color, settings)
   const row = timeToRow(block.startHour, block.startMinute)
   const span = durationRows(
@@ -48,11 +56,10 @@ export function EventBlock({
     block.endMinute,
   )
 
+  const useDark = incognito || settings.darkMode
   const highContrast = settings.highContrast
-  const motionClass = reducedMotion ? '' : 'transition-all duration-200'
 
-  // Determine styling based on incognito / high contrast
-  const blockStyle = incognito
+  const blockStyle = useDark
     ? INCOGNITO_BLOCK_STYLES[block.color] ?? INCOGNITO_BLOCK_STYLES.ecs
     : null
 
@@ -70,27 +77,30 @@ export function EventBlock({
       ? 'text-black'
       : `${visual.subtext} opacity-80`
 
-  const baseClass = `a11y-focusable absolute left-0.5 right-0.5 z-10 overflow-hidden px-1.5 py-1 text-left text-[11px] leading-snug shadow-sm ${motionClass} ${bgClass} ${borderClass} ${textClass} ${fontWeight} ${
+  const handleClick = () => {
+    if (settings.announceBlocks) announceBlock(block)
+    onClick?.()
+  }
+
+  const baseClass = `a11y-focusable absolute left-0.5 right-0.5 z-10 overflow-hidden px-1.5 py-1 text-left text-[11px] leading-snug shadow-sm transition-all duration-200 ${bgClass} ${borderClass} ${textClass} ${fontWeight} ${
     block.clickable
-      ? `cursor-pointer ${reducedMotion ? '' : 'hover:brightness-110 hover:shadow-md'}`
+      ? 'cursor-pointer hover:brightness-110 hover:shadow-md'
       : 'cursor-default'
   }`
-
-  const ariaLabel = settings.screenReader ? getBlockAriaLabel(block) : undefined
 
   return (
     <button
       type="button"
-      onClick={onClick}
-      disabled={!block.clickable && !onMemberJoin && !block.memberCount}
+      onClick={block.clickable || settings.announceBlocks ? handleClick : undefined}
+      disabled={!block.clickable && !onMemberJoin && !block.memberCount && !settings.announceBlocks}
       className={baseClass}
       style={{
         gridRow: `${row + 1} / span ${span}`,
         ...blockRadiusStyle,
       }}
-      aria-label={ariaLabel}
+      aria-label={getBlockAriaLabel(block)}
     >
-      {visual.pattern && !incognito && (
+      {visual.pattern && !useDark && (
         <div
           className={`pointer-events-none absolute inset-0 ${visual.pattern}`}
           aria-hidden
@@ -113,8 +123,7 @@ export function EventBlock({
           onJoin={!block.clickable ? onMemberJoin : undefined}
           confirmed={confirmed}
           starRating={starRating}
-          reducedMotion={reducedMotion}
-          incognito={incognito}
+          useDark={useDark}
         />
       )}
     </button>
@@ -126,15 +135,13 @@ function MemberBadge({
   onJoin,
   confirmed,
   starRating,
-  reducedMotion,
-  incognito,
+  useDark,
 }: {
   count: { filled: number; max: number }
   onJoin?: () => void
   confirmed: boolean
   starRating?: number
-  reducedMotion: boolean
-  incognito?: boolean
+  useDark?: boolean
 }) {
   const isFull = count.filled >= count.max
   const hasRating = starRating !== undefined && starRating > 0
@@ -151,17 +158,15 @@ function MemberBadge({
       <div
         className={`flex items-center gap-0.5 text-[10px] ${
           isFull
-            ? incognito ? 'text-gray-400' : 'text-gray-400'
-            : incognito ? 'text-teal-300' : 'text-teal-700'
+            ? 'text-gray-400'
+            : useDark ? 'text-teal-300' : 'text-teal-700'
         }`}
       >
         <Users className="h-2.5 w-2.5" />
-        <span>
-          {count.filled}/{count.max}
-        </span>
+        <span>{count.filled}/{count.max}</span>
       </div>
       {confirmed && (
-        <Check className={`h-3 w-3 ${incognito ? 'text-green-400' : 'text-green-600'}`} />
+        <Check className={`h-3 w-3 ${useDark ? 'text-green-400' : 'text-green-600'}`} />
       )}
       {onJoin && !isFull && !confirmed && (
         <button
@@ -170,10 +175,8 @@ function MemberBadge({
             e.stopPropagation()
             onJoin()
           }}
-          className={`rounded px-1 py-0.5 text-[9px] font-medium ${
-            reducedMotion ? '' : 'transition-colors duration-150'
-          } ${
-            incognito
+          className={`rounded px-1 py-0.5 text-[9px] font-medium transition-colors duration-150 ${
+            useDark
               ? 'bg-teal-700/50 text-teal-200 hover:bg-teal-700'
               : 'bg-teal-100 text-teal-800 hover:bg-teal-200'
           }`}

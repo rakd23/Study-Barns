@@ -3,23 +3,21 @@ export type TextSize = 'small' | 'medium' | 'large'
 export interface AccessibilitySettings {
   highContrast: boolean
   colorBlind: boolean
-  reducedMotion: boolean
+  darkMode: boolean
   textSize: TextSize
   focusMode: boolean
   simplifiedView: boolean
-  keyboardNav: boolean
-  screenReader: boolean
+  announceBlocks: boolean
 }
 
 export const DEFAULT_ACCESSIBILITY_SETTINGS: AccessibilitySettings = {
   highContrast: false,
   colorBlind: false,
-  reducedMotion: false,
+  darkMode: false,
   textSize: 'medium',
   focusMode: false,
   simplifiedView: false,
-  keyboardNav: false,
-  screenReader: false,
+  announceBlocks: false,
 }
 
 export type AccessibilitySettingKey = keyof AccessibilitySettings
@@ -30,9 +28,8 @@ export const SETTING_LABELS: Record<
 > = {
   highContrast: 'High Contrast',
   colorBlind: 'Color Blind',
-  reducedMotion: 'Reduced Motion',
+  darkMode: 'Dark Mode',
   focusMode: 'Focus Mode',
   simplifiedView: 'Simplified View',
-  keyboardNav: 'Keyboard Navigation',
-  screenReader: 'Screen Reader',
+  announceBlocks: 'Announce Blocks',
 }

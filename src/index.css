@@ -1,0 +1,179 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-navy: #0d1b2e;
+  --color-gold: #c4a84b;
+  --color-ecs: #3b82f6;
+  --color-bis: #22c55e;
+  --color-psc: #a855f7;
+  --color-assignment: #ec4899;
+  --color-aatc: #14b8a6;
+  --color-oh: #e76f51;
+  --color-ta: #eab308;
+  --color-study: #f43f5e;
+  --font-sans: 'Inter', Arial, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  font-size: calc(1rem * var(--a11y-text-scale, 1));
+}
+
+/* Color-blind pattern overlays */
+.a11y-pattern-diagonal {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 4px,
+    rgba(0, 0, 0, 0.12) 4px,
+    rgba(0, 0, 0, 0.12) 5px
+  );
+}
+
+.a11y-pattern-dots {
+  background-image: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px
+  );
+  background-size: 6px 6px;
+}
+
+.a11y-pattern-crosshatch {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 5px,
+      rgba(0, 0, 0, 0.1) 5px,
+      rgba(0, 0, 0, 0.1) 6px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 5px,
+      rgba(0, 0, 0, 0.1) 5px,
+      rgba(0, 0, 0, 0.1) 6px
+    );
+}
+
+/* High contrast app shell */
+.a11y-high-contrast #app-shell,
+.a11y-high-contrast #app-shell main,
+.a11y-high-contrast .bg-white {
+  background-color: #ffffff !important;
+}
+
+.a11y-high-contrast .text-gray-400,
+.a11y-high-contrast .text-gray-500,
+.a11y-high-contrast .text-gray-600 {
+  color: #000000 !important;
+}
+
+/* Reduced motion */
+.a11y-reduced-motion *,
+.a11y-reduced-motion *::before,
+.a11y-reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+.a11y-reduced-motion .animate-modal-in,
+.a11y-reduced-motion .animate-check-in,
+.a11y-reduced-motion .animate-review-in,
+.a11y-reduced-motion .animate-review-out {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Keyboard navigation focus rings */
+.a11y-keyboard-nav .a11y-focusable:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.a11y-keyboard-nav button:focus-visible,
+.a11y-keyboard-nav a:focus-visible,
+.a11y-keyboard-nav input:focus-visible,
+.a11y-keyboard-nav select:focus-visible,
+.a11y-keyboard-nav textarea:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes check-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes review-in {
+  from {
+    opacity: 0;
+    transform: translate(1.5rem, 1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes review-out {
+  to {
+    opacity: 0;
+    transform: translate(1.5rem, 1.5rem);
+  }
+}
+
+.animate-modal-in {
+  animation: modal-in 200ms ease-out forwards;
+}
+
+.animate-check-in {
+  animation: check-in 400ms ease-out forwards;
+}
+
+.animate-review-in {
+  animation: review-in 300ms ease-out forwards;
+}
+
+.animate-review-out {
+  animation: review-out 300ms ease-in forwards;
+}
+
+.input-field {
+  @apply w-full rounded border border-gray-200 px-3 py-2 text-sm transition-colors duration-200 focus:border-gold focus:outline-none;
+}

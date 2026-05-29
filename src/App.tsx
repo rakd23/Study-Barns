@@ -63,10 +63,18 @@ export default function App() {
   const dismissMs = reducedMotion ? 0 : 300
 
   const [rightBlocks, setRightBlocks] = useState<CalendarBlock[]>(RIGHT_BLOCKS)
-  const [confirmedIds, setConfirmedIds] = useState<Set<string>>(new Set())
+  const [confirmedIds, setConfirmedIds] = useState<Set<string>>(
+    () => new Set(['aatc-mon', 'aatc-fri-am']),
+  )
   const [memberCounts, setMemberCounts] = useState<
     Record<string, { filled: number; max: number }>
-  >({})
+  >(() => {
+    const init: Record<string, { filled: number; max: number }> = {}
+    RIGHT_BLOCKS.forEach((b) => {
+      if (b.memberCount) init[b.id] = { ...b.memberCount }
+    })
+    return init
+  })
   const [starRatings, setStarRatings] = useState<Record<string, number>>({})
   const [booking, setBooking] = useState<BookingState | null>(null)
   const [createOpen, setCreateOpen] = useState(false)

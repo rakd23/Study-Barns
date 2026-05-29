@@ -205,7 +205,10 @@ export function SharedWeekGrid({
                       ? 'border-l-2 border-gray-300'
                       : ''
                   }
-                  style={{ gridColumn: i + 1, gridRow: `1 / span ${rows}` }}
+                  style={{
+                    gridColumn: viewMode === 'full' ? i + 6 : i + 1,
+                    gridRow: `1 / span ${rows}`,
+                  }}
                   {...columnProps}
                 />
               ))}

@@ -72,7 +72,7 @@ body {
     );
 }
 
-/* High contrast app shell */
+/* High contrast: bold text + 2px black borders on all block elements */
 .a11y-high-contrast #app-shell,
 .a11y-high-contrast #app-shell main,
 .a11y-high-contrast .bg-white {
@@ -83,15 +83,36 @@ body {
 .a11y-high-contrast .text-gray-500,
 .a11y-high-contrast .text-gray-600 {
   color: #000000 !important;
+  font-weight: 700 !important;
 }
 
-/* Reduced motion */
+.a11y-high-contrast p,
+.a11y-high-contrast span,
+.a11y-high-contrast div,
+.a11y-high-contrast h1,
+.a11y-high-contrast h2,
+.a11y-high-contrast h3,
+.a11y-high-contrast button,
+.a11y-high-contrast label {
+  font-weight: 700 !important;
+}
+
+.a11y-high-contrast button,
+.a11y-high-contrast [role="switch"],
+.a11y-high-contrast input,
+.a11y-high-contrast select,
+.a11y-high-contrast textarea {
+  border: 2px solid #000000 !important;
+}
+
+/* Reduced motion: kill all animations and transitions */
 .a11y-reduced-motion *,
 .a11y-reduced-motion *::before,
 .a11y-reduced-motion *::after {
   animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
+  transition-delay: 0ms !important;
 }
 
 .a11y-reduced-motion .animate-modal-in,
@@ -103,19 +124,22 @@ body {
   transform: none !important;
 }
 
-/* Keyboard navigation focus rings */
+/* Keyboard navigation: prominent blue focus rings on ALL interactive elements */
 .a11y-keyboard-nav .a11y-focusable:focus-visible {
-  outline: 3px solid #2563eb;
-  outline-offset: 2px;
+  outline: 3px solid #2563eb !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.3) !important;
 }
 
 .a11y-keyboard-nav button:focus-visible,
 .a11y-keyboard-nav a:focus-visible,
 .a11y-keyboard-nav input:focus-visible,
 .a11y-keyboard-nav select:focus-visible,
-.a11y-keyboard-nav textarea:focus-visible {
-  outline: 3px solid #2563eb;
-  outline-offset: 2px;
+.a11y-keyboard-nav textarea:focus-visible,
+.a11y-keyboard-nav [role="switch"]:focus-visible {
+  outline: 3px solid #2563eb !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.3) !important;
 }
 
 @keyframes modal-in {

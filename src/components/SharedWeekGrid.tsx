@@ -27,23 +27,30 @@ interface SharedWeekGridProps {
   onBlockClick?: (block: CalendarBlock) => void
   onMemberJoin?: (blockId: string) => void
   viewMode?: GridViewMode
+  incognito?: boolean
 }
 
 function DayHeader({
   label,
   date,
   className = '',
+  incognito,
 }: {
   label: string
   date: string
   className?: string
+  incognito?: boolean
 }) {
   return (
     <div
-      className={`border-l border-gray-200 py-2 text-center text-xs font-semibold text-gray-700 ${className}`}
+      className={`border-l py-2 text-center text-xs font-semibold transition-colors duration-300 ${
+        incognito
+          ? 'border-white/10 text-gray-300'
+          : 'border-gray-200 text-gray-700'
+      } ${className}`}
     >
       <div>{label}</div>
-      <div className="text-gray-400">{date}</div>
+      <div className={incognito ? 'text-gray-500' : 'text-gray-400'}>{date}</div>
     </div>
   )
 }
@@ -56,6 +63,7 @@ export function SharedWeekGrid({
   onBlockClick,
   onMemberJoin,
   viewMode = 'full',
+  incognito = false,
 }: SharedWeekGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const timeRailRef = useRef<HTMLDivElement>(null)
@@ -86,6 +94,7 @@ export function SharedWeekGrid({
     starRatings,
     onBlockClick,
     onMemberJoin,
+    incognito,
   }
 
   const handleScroll = () => {
@@ -95,16 +104,28 @@ export function SharedWeekGrid({
     }
   }
 
+  const bgClass = incognito ? 'bg-[#1a1a2e]' : 'bg-white'
+  const headerBgClass = incognito ? 'bg-[#12122a]' : 'bg-gray-50'
+  const borderClass = incognito ? 'border-white/10' : 'border-gray-200'
+  const timeTextClass = incognito ? 'text-gray-500' : 'text-gray-400'
+  const gutterBgClass = incognito ? 'bg-[#1a1a2e]' : 'bg-white'
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">
+    <div className={`flex min-h-0 flex-1 flex-col overflow-hidden transition-colors duration-300 ${bgClass}`}>
+      {/* Day headers */}
       <div
-        className="grid shrink-0 border-b border-gray-200 bg-gray-50"
+        className={`grid shrink-0 border-b transition-colors duration-300 ${headerBgClass} ${borderClass}`}
         style={{ gridTemplateColumns: headerColumns }}
       >
         <div />
         {showLeft &&
           DAYS.map((d) => (
-            <DayHeader key={`l-h-${d.key}`} label={d.label} date={d.date} />
+            <DayHeader
+              key={`l-h-${d.key}`}
+              label={d.label}
+              date={d.date}
+              incognito={incognito}
+            />
           ))}
         {showRight &&
           DAYS.map((d, i) => (
@@ -112,6 +133,7 @@ export function SharedWeekGrid({
               key={`r-h-${d.key}`}
               label={d.label}
               date={d.date}
+              incognito={incognito}
               className={
                 viewMode === 'full' && i === 0 ? 'border-l-2 border-gray-300' : ''
               }
@@ -120,8 +142,9 @@ export function SharedWeekGrid({
       </div>
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
+        {/* Time gutter */}
         <div
-          className="relative shrink-0 overflow-hidden border-r border-gray-200 bg-white"
+          className={`relative shrink-0 overflow-hidden border-r transition-colors duration-300 ${borderClass} ${gutterBgClass}`}
           style={{ width: TIME_GUTTER_WIDTH }}
           aria-hidden
         >
@@ -133,7 +156,7 @@ export function SharedWeekGrid({
             {hours.map((hour, i) => (
               <div
                 key={hour}
-                className="absolute right-2 text-right text-[10px] leading-none text-gray-400"
+                className={`absolute right-2 text-right text-[10px] leading-none transition-colors duration-300 ${timeTextClass}`}
                 style={{
                   top: i * rowHeight * 2 + 2,
                   height: rowHeight * 2,
@@ -145,6 +168,7 @@ export function SharedWeekGrid({
           </div>
         </div>
 
+        {/* Scrollable grid */}
         <div
           ref={scrollRef}
           onScroll={handleScroll}

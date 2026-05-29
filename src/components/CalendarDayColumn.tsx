@@ -12,6 +12,7 @@ interface CalendarDayColumnProps {
   onMemberJoin?: (blockId: string) => void
   className?: string
   style?: React.CSSProperties
+  incognito?: boolean
 }
 
 export function CalendarDayColumn({
@@ -25,12 +26,17 @@ export function CalendarDayColumn({
   onMemberJoin,
   className = '',
   style,
+  incognito = false,
 }: CalendarDayColumnProps) {
   const dayBlocks = blocks.filter((b) => b.days.includes(day))
 
+  const borderColor = incognito ? 'border-white/5' : 'border-gray-100'
+  const evenColor = incognito ? 'border-white/5' : 'border-gray-100'
+  const oddColor = incognito ? 'border-white/[0.03]' : 'border-gray-50'
+
   return (
     <div
-      className={`relative border-l border-gray-100 ${className}`}
+      className={`relative border-l transition-colors duration-300 ${borderColor} ${className}`}
       style={{
         display: 'grid',
         gridTemplateRows: `repeat(${rows}, ${rowHeightPx}px)`,
@@ -40,7 +46,9 @@ export function CalendarDayColumn({
       {Array.from({ length: rows }).map((_, i) => (
         <div
           key={i}
-          className={`border-b ${i % 2 === 0 ? 'border-gray-100' : 'border-gray-50'}`}
+          className={`border-b transition-colors duration-300 ${
+            i % 2 === 0 ? evenColor : oddColor
+          }`}
         />
       ))}
 
@@ -56,6 +64,7 @@ export function CalendarDayColumn({
           onMemberJoin={
             onMemberJoin ? () => onMemberJoin(block.id) : undefined
           }
+          incognito={incognito}
         />
       ))}
     </div>

@@ -1,3 +1,4 @@
+import { useAccessibility } from '../accessibility/AccessibilityContext'
 import { useRef } from 'react'
 import type { CalendarBlock } from '../types'
 import { DAYS, HOUR_END, HOUR_START } from '../data/initialBlocks'
@@ -89,7 +90,9 @@ export function SharedWeekGrid({
   const hours: number[] = []
   for (let h = HOUR_START; h <= HOUR_END; h++) hours.push(h)
   const rows = totalGridRows()
-  const rowHeight = GRID_ROW_HEIGHT_PX
+  const { settings } = useAccessibility()
+  const scaleMap = { small: 0.82, medium: 1, large: 1.22 }
+  const rowHeight = Math.round(GRID_ROW_HEIGHT_PX * scaleMap[settings.textSize])
   const gridHeight = calendarGridHeightPx()
 
   const columnProps = {
